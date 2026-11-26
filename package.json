@@ -1,0 +1,14 @@
+{
+  "name": "bitedash-food-delivery",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack food delivery web application (MERN)",
+  "scripts": {
+    "build": "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build",
+    "start": "node backend/server.js",
+    "seed": "npm --prefix backend run data:import"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
