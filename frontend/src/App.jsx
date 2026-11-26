@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -14,30 +15,36 @@ import FoodDetails from './pages/FoodDetails';
 import Cart from './pages/Cart';
 import Order from './pages/Order';
 import OrderDetails from './pages/OrderDetails';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 
 const App = () => {
   return (
-    <CartProvider>
-      <Router>
-        <div className="app-wrapper">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/restaurant/:id" element={<Restaurant />} />
-              <Route path="/food/:id" element={<FoodDetails />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/order" element={<Order />} />
-              <Route path="/orders/:id" element={<OrderDetails />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-        <ToastContainer position="bottom-right" />
-      </Router>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <Router>
+          <div className="app-wrapper">
+            <Navbar />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/restaurant/:id" element={<Restaurant />} />
+                <Route path="/food/:id" element={<FoodDetails />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/order" element={<Order />} />
+                <Route path="/orders/:id" element={<OrderDetails />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+          <ToastContainer position="bottom-right" />
+        </Router>
+      </CartProvider>
+    </AuthProvider>
   );
 };
 

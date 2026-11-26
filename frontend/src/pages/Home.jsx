@@ -15,32 +15,24 @@ const Home = () => {
   const [foods, setFoods] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
+  const [foodLoading, setFoodLoading] = useState(false);
   const [error, setError] = useState('');
   const [retryCount, setRetryCount] = useState(0);
   const restaurantsSectionRef = useRef(null);
 
+  // Load restaurants only on initial mount, search keyword change, or retry
   useEffect(() => {
     let isMounted = true;
 
-    const loadData = async () => {
+    const loadRestaurants = async () => {
       try {
         setLoading(true);
         setError('');
         const trimmed = keyword.trim();
         const restQuery = trimmed ? `?keyword=${encodeURIComponent(trimmed)}` : '';
-
-        const foodParams = new URLSearchParams();
-        if (trimmed) foodParams.set('keyword', trimmed);
-        if (selectedCategory !== 'All') foodParams.set('category', selectedCategory);
-        const foodQuery = foodParams.toString() ? `?${foodParams.toString()}` : '';
-
-        const [restRes, foodRes] = await Promise.all([
-          api.get(`/api/restaurants${restQuery}`),
-          api.get(`/api/food${foodQuery}`),
-        ]);
+        const { data } = await api.get(`/api/restaurants${restQuery}`);
         if (!isMounted) return;
-        setRestaurants(restRes.data);
-        setFoods(foodRes.data);
+        setRestaurants(data);
       } catch (err) {
         if (!isMounted) return;
         setError(err.response?.data?.message || 'Unable to load menu right now. Please try again.');
@@ -51,7 +43,39 @@ const Home = () => {
       }
     };
 
-    loadData();
+    loadRestaurants();
+    return () => {
+      isMounted = false;
+    };
+  }, [keyword, retryCount]);
+
+  // Load food items in-place when category or keyword changes so scroll position stays intact
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadFoods = async () => {
+      try {
+        setFoodLoading(true);
+        const trimmed = keyword.trim();
+        const foodParams = new URLSearchParams();
+        if (trimmed) foodParams.set('keyword', trimmed);
+        if (selectedCategory !== 'All') foodParams.set('category', selectedCategory);
+        const foodQuery = foodParams.toString() ? `?${foodParams.toString()}` : '';
+
+        const { data } = await api.get(`/api/food${foodQuery}`);
+        if (!isMounted) return;
+        setFoods(data);
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err.response?.data?.message || 'Unable to load menu right now. Please try again.');
+      } finally {
+        if (isMounted) {
+          setFoodLoading(false);
+        }
+      }
+    };
+
+    loadFoods();
     return () => {
       isMounted = false;
     };
@@ -145,10 +169,10 @@ const Home = () => {
             ))}
           </div>
         </div>
-        {foods.length === 0 ? (
+        {foods.length === 0 && !foodLoading ? (
           <p>No food items found.</p>
         ) : (
-          <div className="grid foods-grid">
+          <div className={`grid foods-grid ${foodLoading ? 'foods-grid-updating' : ''}`}>
             {foods.map((food) => (
               <FoodCard key={food._id} food={food} />
             ))}

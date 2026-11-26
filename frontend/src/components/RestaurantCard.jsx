@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaMapMarkerAlt } from 'react-icons/fa';
+import { formatINR } from '../utils/currency';
 import './RestaurantCard.css';
 
 const RestaurantCard = ({ restaurant }) => {
@@ -25,7 +26,7 @@ const RestaurantCard = ({ restaurant }) => {
             <span>{restaurant.location}</span>
           </div>
           <div className="fee">
-            Delivery: ${restaurant.deliveryFee.toFixed(2)}
+            Delivery: {formatINR(restaurant.deliveryFee)}
           </div>
         </div>
       </div>

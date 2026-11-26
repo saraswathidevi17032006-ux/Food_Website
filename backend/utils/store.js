@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import Restaurant from '../models/Restaurant.js';
 import FoodItem from '../models/FoodItem.js';
 import Order from '../models/Order.js';
+import User from '../models/User.js';
 import seedRestaurants from '../data/restaurants.js';
 import { buildFoodItems } from '../data/foodItems.js';
 import { escapeRegex } from './validation.js';
@@ -10,6 +11,7 @@ let inMemoryMode = false;
 let memRestaurants = [];
 let memFoodItems = [];
 const memOrders = new Map();
+const memUsers = new Map();
 
 const ensureMemorySeeded = () => {
   if (memRestaurants.length > 0) return;
@@ -148,4 +150,42 @@ export const getOrderById = async (id) => {
     return Order.findById(id);
   }
   return memOrders.get(id) || null;
+};
+
+export const findUserByEmail = async (email) => {
+  const normalized = String(email || '').trim().toLowerCase();
+  if (!inMemoryMode) {
+    return User.findOne({ email: normalized });
+  }
+  for (const user of memUsers.values()) {
+    if (user.email === normalized) return user;
+  }
+  return null;
+};
+
+export const findUserById = async (id) => {
+  if (!inMemoryMode) {
+    return User.findById(id).select('-password');
+  }
+  return memUsers.get(id) || null;
+};
+
+export const createUser = async ({ name, email, password }) => {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!inMemoryMode) {
+    const user = new User({ name: name.trim(), email: normalizedEmail, password });
+    return user.save();
+  }
+
+  const now = new Date().toISOString();
+  const user = {
+    _id: new mongoose.Types.ObjectId().toString(),
+    name: name.trim(),
+    email: normalizedEmail,
+    password,
+    createdAt: now,
+    updatedAt: now,
+  };
+  memUsers.set(user._id, user);
+  return user;
 };

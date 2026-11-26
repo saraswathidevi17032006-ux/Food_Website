@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
 import { useCart } from '../context/useCart';
+import { formatINR } from '../utils/currency';
 import './FoodCard.css';
 
 const FoodCard = ({ food }) => {
@@ -22,7 +23,7 @@ const FoodCard = ({ food }) => {
         <h4 className="food-name">{food.name}</h4>
         <p className="food-restaurant">{food.restaurant?.name || 'Local Restaurant'}</p>
         <div className="food-footer">
-          <span className="food-price">${food.price.toFixed(2)}</span>
+          <span className="food-price">{formatINR(food.price)}</span>
           <button
             type="button"
             className="btn-icon add-cart-btn"

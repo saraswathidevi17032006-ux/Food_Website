@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/useCart';
+import { formatINR } from '../utils/currency';
 import { FaTrash, FaMinus, FaPlus, FaArrowRight } from 'react-icons/fa';
 import './Cart.css';
 
@@ -8,7 +9,7 @@ const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal } = useCart();
   const navigate = useNavigate();
 
-  const deliveryFee = cartItems.length > 0 ? 5.0 : 0;
+  const deliveryFee = cartItems.length > 0 ? 40 : 0;
   const grandTotal = getCartTotal() + deliveryFee;
 
   if (cartItems.length === 0) {
@@ -45,7 +46,7 @@ const Cart = () => {
                 <Link to={`/food/${item.foodItem}`}>
                   <h3>{item.name}</h3>
                 </Link>
-                <p className="cart-item-price">${item.price.toFixed(2)}</p>
+                <p className="cart-item-price">{formatINR(item.price)}</p>
               </div>
               <div className="cart-item-actions">
                 <div className="quantity-controls">
@@ -65,7 +66,7 @@ const Cart = () => {
                     <FaPlus />
                   </button>
                 </div>
-                <div className="item-total">${(item.price * item.qty).toFixed(2)}</div>
+                <div className="item-total">{formatINR(item.price * item.qty)}</div>
                 <button
                   type="button"
                   className="remove-btn"
@@ -84,15 +85,15 @@ const Cart = () => {
             <h2>Order Summary</h2>
             <div className="summary-row">
               <span>Items ({cartItems.reduce((acc, item) => acc + item.qty, 0)})</span>
-              <span>${getCartTotal().toFixed(2)}</span>
+              <span>{formatINR(getCartTotal())}</span>
             </div>
             <div className="summary-row">
               <span>Delivery Fee</span>
-              <span>${deliveryFee.toFixed(2)}</span>
+              <span>{formatINR(deliveryFee)}</span>
             </div>
             <div className="summary-row total-row">
               <span>Grand Total</span>
-              <span>${grandTotal.toFixed(2)}</span>
+              <span>{formatINR(grandTotal)}</span>
             </div>
             <button
               type="button"

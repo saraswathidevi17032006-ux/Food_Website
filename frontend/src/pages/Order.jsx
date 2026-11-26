@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import { useCart } from '../context/useCart';
+import { useAuth } from '../context/useAuth';
+import { formatINR } from '../utils/currency';
 import { toast } from 'react-toastify';
 import { FaCheckCircle } from 'react-icons/fa';
 import './Order.css';
 
 const Order = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [customer, setCustomer] = useState({
-    name: '',
-    email: '',
+    name: user?.name || '',
+    email: user?.email || '',
     phone: '',
     address: '',
   });
@@ -20,7 +23,7 @@ const Order = () => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderId, setOrderId] = useState(null);
 
-  const deliveryFee = cartItems.length > 0 ? 5.0 : 0;
+  const deliveryFee = cartItems.length > 0 ? 40 : 0;
   const itemsPrice = getCartTotal();
   const grandTotal = itemsPrice + deliveryFee;
 
@@ -195,22 +198,22 @@ const Order = () => {
                   <span>
                     {item.qty} x {item.name}
                   </span>
-                  <span>${(item.price * item.qty).toFixed(2)}</span>
+                  <span>{formatINR(item.price * item.qty)}</span>
                 </div>
               ))}
             </div>
 
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>${itemsPrice.toFixed(2)}</span>
+              <span>{formatINR(itemsPrice)}</span>
             </div>
             <div className="summary-row">
               <span>Delivery Fee</span>
-              <span>${deliveryFee.toFixed(2)}</span>
+              <span>{formatINR(deliveryFee)}</span>
             </div>
             <div className="summary-row total-row">
               <span>Total</span>
-              <span>${grandTotal.toFixed(2)}</span>
+              <span>{formatINR(grandTotal)}</span>
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ const restaurants = [
     location: 'Downtown City Center',
     categories: ['Burger', 'Fast Food', 'American'],
     deliveryTime: '25-30 min',
-    deliveryFee: 2.50,
+    deliveryFee: 40,
   },
   {
     name: 'Pizza Hut',
@@ -15,7 +15,7 @@ const restaurants = [
     location: 'Westside Mall',
     categories: ['Pizza', 'Italian', 'Fast Food'],
     deliveryTime: '30-45 min',
-    deliveryFee: 3.00,
+    deliveryFee: 49,
   },
   {
     name: 'Biryani House',
@@ -24,7 +24,7 @@ const restaurants = [
     location: 'Tech Park Avenue',
     categories: ['Biryani', 'Indian', 'Curry'],
     deliveryTime: '40-50 min',
-    deliveryFee: 1.50,
+    deliveryFee: 30,
   },
   {
     name: 'Dosa Plaza',
@@ -33,7 +33,7 @@ const restaurants = [
     location: 'South Street',
     categories: ['Dosa', 'South Indian', 'Vegetarian'],
     deliveryTime: '20-30 min',
-    deliveryFee: 1.00,
+    deliveryFee: 25,
   },
   {
     name: 'Wok Noodle',
@@ -42,8 +42,8 @@ const restaurants = [
     location: 'Chinatown',
     categories: ['Noodles', 'Chinese', 'Asian'],
     deliveryTime: '35-45 min',
-    deliveryFee: 2.00,
-  }
+    deliveryFee: 35,
+  },
 ];
 
 export default restaurants;

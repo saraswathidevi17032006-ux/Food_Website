@@ -11,6 +11,7 @@ import { isInMemoryMode } from './utils/store.js';
 import restaurantRoutes from './routes/restaurantRoutes.js';
 import foodRoutes from './routes/foodRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,6 +72,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/food', foodRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authRoutes);
 
 // Serve built frontend if present and not explicitly disabled
 const frontendDistDir = path.resolve(__dirname, '../frontend/dist');

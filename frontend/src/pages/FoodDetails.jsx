@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import { useCart } from '../context/useCart';
+import { formatINR } from '../utils/currency';
 import { FaMinus, FaPlus, FaShoppingCart } from 'react-icons/fa';
 import './FoodDetails.css';
 
@@ -97,7 +98,7 @@ const FoodDetails = () => {
             <p className="restaurant-name">By {food.restaurant?.name || 'Local Restaurant'}</p>
           </div>
 
-          <div className="food-price-large">${food.price.toFixed(2)}</div>
+          <div className="food-price-large">{formatINR(food.price)}</div>
 
           <div className="food-description">
             <h3>Description</h3>
@@ -131,7 +132,7 @@ const FoodDetails = () => {
               className="btn btn-primary add-to-cart-large"
               onClick={handleAddToCart}
             >
-              <FaShoppingCart /> Add to Cart - ${(food.price * qty).toFixed(2)}
+              <FaShoppingCart /> Add to Cart - {formatINR(food.price * qty)}
             </button>
           </div>
         </div>

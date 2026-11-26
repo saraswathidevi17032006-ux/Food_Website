@@ -1,17 +1,17 @@
 import express from 'express';
-import { isValidObjectId } from '../utils/validation.js';
+import { isValidEmail, isValidObjectId } from '../utils/validation.js';
+import { getOptionalAuthUserId } from '../utils/auth.js';
 import { createOrder, findFoodItemsByIds, getOrderById } from '../utils/store.js';
 
 const router = express.Router();
 
-const DELIVERY_FEE = 5.0;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DELIVERY_FEE = 40;
 
 const roundCurrency = (amount) => Math.round(amount * 100) / 100;
 
 // @desc    Create new order
 // @route   POST /api/orders
-// @access  Public
+// @access  Public (associates authenticated user if token provided)
 router.post('/', async (req, res, next) => {
   try {
     const { orderItems, customer } = req.body ?? {};
@@ -31,7 +31,7 @@ router.post('/', async (req, res, next) => {
       throw new Error('Please fill in all customer delivery details');
     }
 
-    if (!EMAIL_REGEX.test(email)) {
+    if (!isValidEmail(email)) {
       res.status(400);
       throw new Error('Please provide a valid email address');
     }
@@ -75,8 +75,10 @@ router.post('/', async (req, res, next) => {
 
     const roundedItemsPrice = roundCurrency(itemsPrice);
     const totalPrice = roundCurrency(roundedItemsPrice + DELIVERY_FEE);
+    const userId = getOptionalAuthUserId(req);
 
     const createdOrder = await createOrder({
+      ...(userId ? { user: userId } : {}),
       orderItems: verifiedItems,
       customer: { name, email, phone, address },
       itemsPrice: roundedItemsPrice,

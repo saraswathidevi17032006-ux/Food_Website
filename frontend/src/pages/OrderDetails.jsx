@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../api/client';
+import { formatINR } from '../utils/currency';
 import { FaCheckCircle } from 'react-icons/fa';
 import './Order.css';
 
@@ -82,22 +83,22 @@ const OrderDetails = () => {
               <span>
                 {item.qty} x {item.name}
               </span>
-              <span>${(item.price * item.qty).toFixed(2)}</span>
+              <span>{formatINR(item.price * item.qty)}</span>
             </div>
           ))}
         </div>
 
         <div className="summary-row">
           <span>Subtotal</span>
-          <span>${order.itemsPrice.toFixed(2)}</span>
+          <span>{formatINR(order.itemsPrice)}</span>
         </div>
         <div className="summary-row">
           <span>Delivery Fee</span>
-          <span>${order.deliveryFee.toFixed(2)}</span>
+          <span>{formatINR(order.deliveryFee)}</span>
         </div>
         <div className="summary-row total-row">
           <span>Total</span>
-          <span>${order.totalPrice.toFixed(2)}</span>
+          <span>{formatINR(order.totalPrice)}</span>
         </div>
 
         <Link to="/" className="btn btn-primary">
