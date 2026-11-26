@@ -24,8 +24,10 @@ const OrderDetails = () => {
       } catch (err) {
         if (!isMounted) return;
         setOrder(null);
-        if (err.response?.status === 404 || err.response?.status === 400) {
-          setError('Order not found.');
+        if (err.response?.status === 401) {
+          setError('Please login to view this order.');
+        } else if (err.response?.status === 404 || err.response?.status === 400 || err.response?.status === 403) {
+          setError(err.response?.data?.message || 'Order not found.');
         } else {
           setError('Unable to load order details right now.');
         }
@@ -55,10 +57,15 @@ const OrderDetails = () => {
       <div className="order-page container">
         <div className="status-card glass-card">
           <h2>{error || 'Order not found'}</h2>
-          <p>Check your order link or browse restaurants from the home page.</p>
-          <Link to="/" className="btn btn-primary">
-            Back to Home
-          </Link>
+          <p>Check your order link or sign in to the account that placed this order.</p>
+          <div className="order-actions">
+            <Link to="/login" state={{ from: `/orders/${id}` }} className="btn btn-outline">
+              Login
+            </Link>
+            <Link to="/" className="btn btn-primary">
+              Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     );

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import { useCart } from '../context/useCart';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { formatINR } from '../utils/currency';
 import { FaMinus, FaPlus, FaShoppingCart } from 'react-icons/fa';
 import './FoodDetails.css';
@@ -10,6 +11,7 @@ const FoodDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const requireAuth = useRequireAuth();
 
   const [food, setFood] = useState(null);
   const [qty, setQty] = useState(1);
@@ -48,6 +50,7 @@ const FoodDetails = () => {
   }, [id]);
 
   const handleAddToCart = () => {
+    if (!requireAuth('Please login or register to add items to your cart')) return;
     addToCart(food, qty);
     navigate('/cart');
   };

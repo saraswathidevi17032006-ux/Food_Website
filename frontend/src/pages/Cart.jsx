@@ -1,13 +1,20 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/useCart';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { formatINR } from '../utils/currency';
 import { FaTrash, FaMinus, FaPlus, FaArrowRight } from 'react-icons/fa';
 import './Cart.css';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal } = useCart();
+  const requireAuth = useRequireAuth();
   const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (!requireAuth('Please login or register to place an order')) return;
+    navigate('/order');
+  };
 
   const deliveryFee = cartItems.length > 0 ? 40 : 0;
   const grandTotal = getCartTotal() + deliveryFee;
@@ -98,7 +105,7 @@ const Cart = () => {
             <button
               type="button"
               className="btn btn-primary checkout-btn"
-              onClick={() => navigate('/order')}
+              onClick={handleCheckout}
             >
               Proceed to Checkout <FaArrowRight />
             </button>

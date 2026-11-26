@@ -10,7 +10,7 @@ import './Order.css';
 
 const Order = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const [customer, setCustomer] = useState({
@@ -33,6 +33,12 @@ const Order = () => {
 
   const placeOrderHandler = async (e) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      toast.info('Please login or register to place an order');
+      navigate('/login', { state: { from: '/order' } });
+      return;
+    }
 
     if (cartItems.length === 0) {
       toast.error('Your cart is empty');
@@ -98,6 +104,25 @@ const Order = () => {
             <button type="button" className="btn btn-primary" onClick={() => navigate('/')}>
               Back to Home
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated && !orderSuccess) {
+    return (
+      <div className="order-page container">
+        <div className="status-card glass-card">
+          <h2>Login Required</h2>
+          <p>Please login or register to place your order.</p>
+          <div className="order-actions">
+            <Link to="/login" state={{ from: '/order' }} className="btn btn-primary">
+              Login
+            </Link>
+            <Link to="/register" state={{ from: '/order' }} className="btn btn-outline">
+              Register
+            </Link>
           </div>
         </div>
       </div>

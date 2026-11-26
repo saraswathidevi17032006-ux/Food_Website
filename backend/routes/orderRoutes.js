@@ -11,9 +11,15 @@ const roundCurrency = (amount) => Math.round(amount * 100) / 100;
 
 // @desc    Create new order
 // @route   POST /api/orders
-// @access  Public (associates authenticated user if token provided)
+// @access  Private
 router.post('/', async (req, res, next) => {
   try {
+    const userId = getOptionalAuthUserId(req);
+    if (!userId) {
+      res.status(401);
+      throw new Error('Please login or register to place an order');
+    }
+
     const { orderItems, customer } = req.body ?? {};
 
     if (!Array.isArray(orderItems) || orderItems.length === 0) {
@@ -75,10 +81,9 @@ router.post('/', async (req, res, next) => {
 
     const roundedItemsPrice = roundCurrency(itemsPrice);
     const totalPrice = roundCurrency(roundedItemsPrice + DELIVERY_FEE);
-    const userId = getOptionalAuthUserId(req);
 
     const createdOrder = await createOrder({
-      ...(userId ? { user: userId } : {}),
+      user: userId,
       orderItems: verifiedItems,
       customer: { name, email, phone, address },
       itemsPrice: roundedItemsPrice,
@@ -94,9 +99,15 @@ router.post('/', async (req, res, next) => {
 
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
-// @access  Public
+// @access  Private
 router.get('/:id', async (req, res, next) => {
   try {
+    const userId = getOptionalAuthUserId(req);
+    if (!userId) {
+      res.status(401);
+      throw new Error('Please login to view order details');
+    }
+
     if (!isValidObjectId(req.params.id)) {
       res.status(400);
       throw new Error('Invalid order ID');
@@ -106,6 +117,11 @@ router.get('/:id', async (req, res, next) => {
     if (!order) {
       res.status(404);
       throw new Error('Order not found');
+    }
+
+    if (order.user && order.user.toString() !== userId) {
+      res.status(403);
+      throw new Error('Not authorized to view this order');
     }
 
     res.json(order);

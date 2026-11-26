@@ -2,14 +2,18 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
 import { useCart } from '../context/useCart';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { formatINR } from '../utils/currency';
 import './FoodCard.css';
 
 const FoodCard = ({ food }) => {
   const { addToCart } = useCart();
+  const requireAuth = useRequireAuth();
 
   const handleAddToCart = (e) => {
-    e.preventDefault(); // prevent link navigation if button is clicked
+    e.preventDefault();
+    e.stopPropagation();
+    if (!requireAuth('Please login or register to add items to your cart')) return;
     addToCart(food, 1);
   };
 
