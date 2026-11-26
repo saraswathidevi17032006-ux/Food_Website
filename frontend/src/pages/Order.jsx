@@ -88,9 +88,14 @@ const Order = () => {
             Your delicious food is being prepared and will be delivered to{' '}
             <em>{customer.address}</em> soon.
           </p>
-          <button type="button" className="btn btn-primary" onClick={() => navigate('/')}>
-            Back to Home
-          </button>
+          <div className="order-actions">
+            <Link to={`/orders/${orderId}`} className="btn btn-outline">
+              View Order Details
+            </Link>
+            <button type="button" className="btn btn-primary" onClick={() => navigate('/')}>
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );

@@ -74,6 +74,47 @@
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.section-header-row .section-title {
+  margin-bottom: 0;
+}
+
+.category-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-pill {
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  background: var(--card-bg);
+  color: var(--text-light);
+  border: 1px solid var(--glass-border);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.category-pill:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.category-pill.active {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
 .search-results-header {
   display: flex;
   align-items: center;

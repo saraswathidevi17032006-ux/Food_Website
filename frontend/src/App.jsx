@@ -13,6 +13,7 @@ import Restaurant from './pages/Restaurant';
 import FoodDetails from './pages/FoodDetails';
 import Cart from './pages/Cart';
 import Order from './pages/Order';
+import OrderDetails from './pages/OrderDetails';
 import NotFound from './pages/NotFound';
 
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
               <Route path="/food/:id" element={<FoodDetails />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/order" element={<Order />} />
+              <Route path="/orders/:id" element={<OrderDetails />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

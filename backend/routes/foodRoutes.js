@@ -1,26 +1,18 @@
 import express from 'express';
-import FoodItem from '../models/FoodItem.js';
-import { escapeRegex, isValidObjectId } from '../utils/validation.js';
+import { isValidObjectId } from '../utils/validation.js';
+import { listFoodItems, getFoodItemById } from '../utils/store.js';
 
 const router = express.Router();
 
-// @desc    Fetch all food items (useful for search)
+// @desc    Fetch all food items (useful for search & category filtering)
 // @route   GET /api/food
 // @access  Public
 router.get('/', async (req, res, next) => {
   try {
-    const rawKeyword = typeof req.query.keyword === 'string' ? req.query.keyword.trim() : '';
-    const rawCategory = typeof req.query.category === 'string' ? req.query.category.trim() : '';
+    const keyword = typeof req.query.keyword === 'string' ? req.query.keyword.trim() : '';
+    const category = typeof req.query.category === 'string' ? req.query.category.trim() : '';
 
-    const filter = {};
-    if (rawKeyword) {
-      filter.name = { $regex: escapeRegex(rawKeyword), $options: 'i' };
-    }
-    if (rawCategory) {
-      filter.category = { $regex: `^${escapeRegex(rawCategory)}$`, $options: 'i' };
-    }
-
-    const foodItems = await FoodItem.find(filter).populate('restaurant', 'name');
+    const foodItems = await listFoodItems({ keyword, category });
     res.json(foodItems);
   } catch (error) {
     next(error);
@@ -37,7 +29,7 @@ router.get('/:id', async (req, res, next) => {
       throw new Error('Invalid food item ID');
     }
 
-    const foodItem = await FoodItem.findById(req.params.id).populate('restaurant', 'name location');
+    const foodItem = await getFoodItemById(req.params.id);
     if (!foodItem) {
       res.status(404);
       throw new Error('Food item not found');

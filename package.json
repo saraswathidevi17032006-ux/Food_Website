@@ -4,6 +4,7 @@
   "private": true,
   "description": "Full-stack food delivery web application (MERN)",
   "scripts": {
+    "dev": "node scripts/dev.js",
     "build": "npm --prefix backend install --omit=dev && npm --prefix frontend install --include=dev && npm --prefix frontend run build",
     "start": "node backend/server.js",
     "seed": "npm --prefix backend run data:import"

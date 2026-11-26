@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
+import { isInMemoryMode } from './utils/store.js';
 
 import restaurantRoutes from './routes/restaurantRoutes.js';
 import foodRoutes from './routes/foodRoutes.js';
@@ -45,6 +46,14 @@ app.use(express.json({ limit: '1mb' }));
 
 // Health check endpoint for deployment platforms
 app.get('/api/health', (req, res) => {
+  if (isInMemoryMode()) {
+    return res.status(200).json({
+      status: 'ok',
+      database: 'in-memory-dev',
+      uptime: Math.round(process.uptime()),
+    });
+  }
+
   const dbStates = {
     0: 'disconnected',
     1: 'connected',
@@ -52,7 +61,7 @@ app.get('/api/health', (req, res) => {
     3: 'disconnecting',
   };
   const dbStatus = dbStates[mongoose.connection.readyState] || 'unknown';
-  res.status(dbStatus === 'connected' ? 200 : 503).json({
+  return res.status(dbStatus === 'connected' ? 200 : 503).json({
     status: dbStatus === 'connected' ? 'ok' : 'degraded',
     database: dbStatus,
     uptime: Math.round(process.uptime()),
@@ -110,13 +119,17 @@ const startServer = async () => {
   try {
     await connectDB();
     const server = app.listen(PORT, () => {
-      console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+      console.log(
+        `Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`
+      );
     });
 
-    const shutdown = async (signal) => {
+    const shutdown = (signal) => {
       console.log(`${signal} received. Shutting down gracefully...`);
       server.close(async () => {
-        await mongoose.connection.close();
+        if (mongoose.connection.readyState !== 0) {
+          await mongoose.connection.close().catch(() => {});
+        }
         process.exit(0);
       });
     };

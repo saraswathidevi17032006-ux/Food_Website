@@ -1,7 +1,6 @@
 import express from 'express';
-import Order from '../models/Order.js';
-import FoodItem from '../models/FoodItem.js';
 import { isValidObjectId } from '../utils/validation.js';
+import { createOrder, findFoodItemsByIds, getOrderById } from '../utils/store.js';
 
 const router = express.Router();
 
@@ -37,7 +36,6 @@ router.post('/', async (req, res, next) => {
       throw new Error('Please provide a valid email address');
     }
 
-    // Aggregate quantities per foodItem and validate IDs/quantities
     const qtyById = new Map();
     for (const item of orderItems) {
       const id = String(item?.foodItem ?? '');
@@ -53,8 +51,7 @@ router.post('/', async (req, res, next) => {
       qtyById.set(id, (qtyById.get(id) ?? 0) + qty);
     }
 
-    // Fetch authoritative prices and metadata from the database
-    const foodDocs = await FoodItem.find({ _id: { $in: [...qtyById.keys()] } });
+    const foodDocs = await findFoodItemsByIds([...qtyById.keys()]);
     const foodMap = new Map(foodDocs.map((doc) => [doc._id.toString(), doc]));
 
     const verifiedItems = [];
@@ -79,7 +76,7 @@ router.post('/', async (req, res, next) => {
     const roundedItemsPrice = roundCurrency(itemsPrice);
     const totalPrice = roundCurrency(roundedItemsPrice + DELIVERY_FEE);
 
-    const order = new Order({
+    const createdOrder = await createOrder({
       orderItems: verifiedItems,
       customer: { name, email, phone, address },
       itemsPrice: roundedItemsPrice,
@@ -87,7 +84,6 @@ router.post('/', async (req, res, next) => {
       totalPrice,
     });
 
-    const createdOrder = await order.save();
     res.status(201).json(createdOrder);
   } catch (error) {
     next(error);
@@ -104,7 +100,7 @@ router.get('/:id', async (req, res, next) => {
       throw new Error('Invalid order ID');
     }
 
-    const order = await Order.findById(req.params.id);
+    const order = await getOrderById(req.params.id);
     if (!order) {
       res.status(404);
       throw new Error('Order not found');

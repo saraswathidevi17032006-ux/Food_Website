@@ -5,12 +5,15 @@ import RestaurantCard from '../components/RestaurantCard';
 import FoodCard from '../components/FoodCard';
 import './Home.css';
 
+const CATEGORIES = ['All', 'Burger', 'Pizza', 'Biryani', 'Dosa', 'Noodles'];
+
 const Home = () => {
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get('keyword') || '';
 
   const [restaurants, setRestaurants] = useState([]);
   const [foods, setFoods] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [retryCount, setRetryCount] = useState(0);
@@ -23,10 +26,17 @@ const Home = () => {
       try {
         setLoading(true);
         setError('');
-        const urlSuffix = keyword.trim() ? `?keyword=${encodeURIComponent(keyword.trim())}` : '';
+        const trimmed = keyword.trim();
+        const restQuery = trimmed ? `?keyword=${encodeURIComponent(trimmed)}` : '';
+
+        const foodParams = new URLSearchParams();
+        if (trimmed) foodParams.set('keyword', trimmed);
+        if (selectedCategory !== 'All') foodParams.set('category', selectedCategory);
+        const foodQuery = foodParams.toString() ? `?${foodParams.toString()}` : '';
+
         const [restRes, foodRes] = await Promise.all([
-          api.get(`/api/restaurants${urlSuffix}`),
-          api.get(`/api/food${urlSuffix}`),
+          api.get(`/api/restaurants${restQuery}`),
+          api.get(`/api/food${foodQuery}`),
         ]);
         if (!isMounted) return;
         setRestaurants(restRes.data);
@@ -45,7 +55,7 @@ const Home = () => {
     return () => {
       isMounted = false;
     };
-  }, [keyword, retryCount]);
+  }, [keyword, selectedCategory, retryCount]);
 
   if (loading) {
     return (
@@ -120,7 +130,21 @@ const Home = () => {
       </section>
 
       <section className="section">
-        <h2 className="section-title">Popular Food Items</h2>
+        <div className="section-header-row">
+          <h2 className="section-title">Popular Food Items</h2>
+          <div className="category-pills" role="tablist" aria-label="Food categories">
+            {CATEGORIES.map((category) => (
+              <button
+                key={category}
+                type="button"
+                className={`category-pill ${selectedCategory === category ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
         {foods.length === 0 ? (
           <p>No food items found.</p>
         ) : (

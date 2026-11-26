@@ -94,6 +94,13 @@
   margin-top: 20px;
 }
 
+.order-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 @media (max-width: 768px) {
   .order-layout {
     flex-direction: column-reverse;
