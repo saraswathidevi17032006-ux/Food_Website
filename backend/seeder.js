@@ -6,8 +6,11 @@ import connectDB from './config/db.js';
 import Restaurant from './models/Restaurant.js';
 import FoodItem from './models/FoodItem.js';
 import Order from './models/Order.js';
+import User from './models/User.js';
 import restaurants from './data/restaurants.js';
 import { buildFoodItems } from './data/foodItems.js';
+import { seedUsers } from './data/users.js';
+import { hashPassword } from './utils/auth.js';
 import { isInMemoryMode } from './utils/store.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +23,7 @@ const importData = async () => {
   await Order.deleteMany();
   await FoodItem.deleteMany();
   await Restaurant.deleteMany();
+  await User.deleteMany();
 
   const createdRestaurants = await Restaurant.insertMany(restaurants);
   const restaurantsByName = Object.fromEntries(
@@ -27,6 +31,13 @@ const importData = async () => {
   );
 
   await FoodItem.insertMany(buildFoodItems(restaurantsByName));
+  await User.insertMany(
+    seedUsers.map((user) => ({
+      name: user.name,
+      email: user.email.trim().toLowerCase(),
+      password: hashPassword(user.password),
+    }))
+  );
   console.log('Data Imported!');
 };
 
@@ -34,6 +45,7 @@ const destroyData = async () => {
   await Order.deleteMany();
   await FoodItem.deleteMany();
   await Restaurant.deleteMany();
+  await User.deleteMany();
   console.log('Data Destroyed!');
 };
 

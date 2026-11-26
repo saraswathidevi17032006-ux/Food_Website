@@ -5,6 +5,8 @@ import Order from '../models/Order.js';
 import User from '../models/User.js';
 import seedRestaurants from '../data/restaurants.js';
 import { buildFoodItems } from '../data/foodItems.js';
+import { seedUsers } from '../data/users.js';
+import { hashPassword } from './auth.js';
 import { escapeRegex } from './validation.js';
 
 let inMemoryMode = false;
@@ -29,6 +31,19 @@ const ensureMemorySeeded = () => {
     _id: new mongoose.Types.ObjectId().toString(),
     ...item,
   }));
+
+  for (const seedUser of seedUsers) {
+    const id = new mongoose.Types.ObjectId().toString();
+    const now = new Date().toISOString();
+    memUsers.set(id, {
+      _id: id,
+      name: seedUser.name,
+      email: seedUser.email.trim().toLowerCase(),
+      password: hashPassword(seedUser.password),
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 };
 
 export const enableInMemoryMode = () => {
