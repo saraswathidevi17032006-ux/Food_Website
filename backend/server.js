@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 const rawOrigins = process.env.CORS_ORIGIN || process.env.CLIENT_URL || '';
 const allowedOrigins = rawOrigins
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
 app.use(
